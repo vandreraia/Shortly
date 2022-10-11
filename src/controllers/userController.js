@@ -31,29 +31,26 @@ export async function getUsers(req, res) {
 
 export async function getUser(req, res) {
     const { email, password } = req.body;
-    const { logeduser } = res.locals;
+    // const { logeduser } = res.locals;
 
     try {
-
         const secretKey = process.env.JWT_SECRET
 
-        const token = jwt.sign(logeduser, secretKey)
-
-        const { rows: user, rowCount } = await connection.query(
-            'SELECT * FROM users WHERE email = $1',
-            [email]
-        );
-
+        const { rows: user, rowCount } = await searchUser(email);
+        
         if (rowCount === 0) {
             return res.sendStatus(401);
         }
 
+        const token = jwt.sign(user[0].email, secretKey)
         const compare = bcrypt.compareSync(password, user[0].password)
 
         if (!compare) {
             return res.sendStatus(401);
         }
-        res.status(200).send(token);
+
+        const obj = {token: token}
+        res.status(200).send(obj);
     } catch (error) {
         console.log(error);
         resizeBy.sendStatus(500);
@@ -61,9 +58,12 @@ export async function getUser(req, res) {
 }
 
 export async function createUser(req, res) {
-    const { name, email, password } = req.body;
+    const { name, email, password, confirmPassword } = req.body;
 
     try {
+        if (password !== confirmPassword) {
+          return res.sendStatus(422);
+        }
         const { rowCount } = await searchUser(email);
 
         if (rowCount > 0) {
