@@ -1,6 +1,5 @@
-import connection from '../db/pgsql.js';
 import { nanoid } from 'nanoid';
-import { insertUrl } from '../repositories/urlRepository.js';
+import { insertUrl, selectUrlById } from '../repositories/urlRepository.js';
 
 export async function shortenUrl(req, res) {
     const { user } = res.locals
@@ -13,6 +12,21 @@ export async function shortenUrl(req, res) {
         return res.status(201).send({ shortUrl: shortUrl });
     } catch (error) {
         console.log(error.message)
+        return res.sendStatus(500);
+    }
+}
+
+export async function getUrlById(req, res) {
+    const { id } = req.params;
+    try {
+        const row = (await selectUrlById(id)).rows[0];
+        
+        if (!row) {
+            return res.sendStatus(404);
+        }
+        
+        return res.status(200).send(row);
+    } catch (error) {
         return res.sendStatus(500);
     }
 }
