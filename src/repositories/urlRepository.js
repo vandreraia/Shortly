@@ -13,9 +13,18 @@ export async function insertUrl(email, url, shortUrl) {
 export async function selectUrlById(id) {
     console.log(id)
     return connection.query(`
-        SELECT *
+        SELECT id, short_url AS "shortUrl", url
         FROM url
         WHERE id = $1
     `, [id]
+    )
+}
+
+export async function selectUrlByUrl(shortUrl) {
+    return connection.query(`
+        SELECT url
+        from url
+        where short_url = $1
+    `, [shortUrl]
     )
 }
