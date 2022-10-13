@@ -22,9 +22,18 @@ export async function selectUrlById(id) {
 
 export async function selectUrlByUrl(shortUrl) {
     return connection.query(`
-        SELECT url
+        SELECT *
         from url
-        where short_url = $1
+        WHERE short_url = $1
     `, [shortUrl]
     )
+}
+
+export async function updateCounter(shortUrl, counter) {
+    counter++;
+    await connection.query(`
+        UPDATE url
+        SET visit_count = $1
+        WHERE short_url = $2
+    `, [counter, shortUrl]);
 }

@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { insertUrl, selectUrlById, selectUrlByUrl } from '../repositories/urlRepository.js';
+import { insertUrl, selectUrlById, selectUrlByUrl, updateCounter } from '../repositories/urlRepository.js';
 
 export async function shortenUrl(req, res) {
     const { user } = res.locals
@@ -35,11 +35,13 @@ export async function openUrl(req, res) {
     const {shortUrl} = req.params;
 
     try {
-        const url = (await selectUrlByUrl(shortUrl)).rows[0].url;
+        const row = (await selectUrlByUrl(shortUrl)).rows[0];
+        const url = row.url;
+        await updateCounter(shortUrl, row.visit_count);
         if (!url) {
             return res.sendStatus(404);
         }
-        console.log(url)
+        
         return res.redirect(url)
     } catch (error) {
         return res.sendStatus(500);        
