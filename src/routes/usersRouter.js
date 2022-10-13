@@ -4,7 +4,6 @@ import {
   getUsers,
   createUser
 } from '../controllers/userController.js';
-import { validateUser } from '../middlewares/userValidator.js';
 import { validateSchema } from '../middlewares/schemaValidator.js';
 import signinSchema from '../schemas/signinSchema.js';
 import signupSchema from '../schemas/signupSchema.js';

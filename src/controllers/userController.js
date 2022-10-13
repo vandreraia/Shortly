@@ -31,7 +31,7 @@ export async function getUsers(req, res) {
 
 export async function getUser(req, res) {
     const { email, password } = req.body;
-    // const { logeduser } = res.locals;
+    const { user } = res.locals;
 
     try {
         const secretKey = process.env.JWT_SECRET
@@ -50,10 +50,10 @@ export async function getUser(req, res) {
         }
 
         const obj = {token: token}
-        res.status(200).send(obj);
+        return res.status(200).send(obj);
     } catch (error) {
         console.log(error);
-        resizeBy.sendStatus(500);
+        return res.sendStatus(500);
     }
 }
 
@@ -72,9 +72,9 @@ export async function createUser(req, res) {
 
         await insertClient(name, email, password);
 
-        res.sendStatus(201);
+        return res.sendStatus(201);
     } catch (error) {
         console.log(error);
-        resizeBy.sendStatus(500);
+        return res.sendStatus(500);
     }
 }
