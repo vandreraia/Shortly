@@ -13,7 +13,7 @@ CREATE TABLE "url" (
 	"visit_count" int NOT NULL DEFAULT '0'
 );
 
-CREATE TABLE "rank" (
+CREATE TABLE "users_url" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" int NOT NULL,
 	"url_id" int NOT NULL,

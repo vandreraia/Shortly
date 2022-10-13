@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { insertUrl, selectUrlById, selectUrlByUrl, updateCounter } from '../repositories/urlRepository.js';
+import { checkUrl, checkUser, insertUrl, selectUrlById, selectUrlByUrl, updateCounter } from '../repositories/urlRepository.js';
 
 export async function shortenUrl(req, res) {
     const { user } = res.locals
@@ -20,7 +20,7 @@ export async function getUrlById(req, res) {
     const { id } = req.params;
     try {
         const row = (await selectUrlById(id)).rows[0];
-        
+
         if (!row) {
             return res.sendStatus(404);
         }
@@ -32,7 +32,7 @@ export async function getUrlById(req, res) {
 }
 
 export async function openUrl(req, res) {
-    const {shortUrl} = req.params;
+    const { shortUrl } = req.params;
 
     try {
         const row = (await selectUrlByUrl(shortUrl)).rows[0];
@@ -41,9 +41,27 @@ export async function openUrl(req, res) {
         if (!url) {
             return res.sendStatus(404);
         }
-        
+
         return res.redirect(url)
     } catch (error) {
-        return res.sendStatus(500);        
+        return res.sendStatus(500);
+    }
+}
+
+export async function deleteUrls(req, res) {
+    const { id } = req.params;
+    const { user } = res.locals
+    console.log(id)
+    try {
+        const { rowCount } = await checkUser(id, user);
+        const { rows } = await checkUrl(id);
+        if (rows.length <= 0) {
+            return res.sendStatus(404);
+        }
+        // console.log(user)
+        await deleteUrls(id);
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).send(error.message);
     }
 }

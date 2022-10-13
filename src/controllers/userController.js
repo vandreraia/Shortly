@@ -42,6 +42,7 @@ export async function getUser(req, res) {
             return res.sendStatus(401);
         }
 
+        // res.locals.user = user[0];
         const token = jwt.sign(user[0].email, secretKey)
         const compare = bcrypt.compareSync(password, user[0].password)
 

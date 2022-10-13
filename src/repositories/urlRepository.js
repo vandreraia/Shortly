@@ -37,3 +37,24 @@ export async function updateCounter(shortUrl, counter) {
         WHERE short_url = $2
     `, [counter, shortUrl]);
 }
+
+export async function checkUser(id, email) {
+    return connection.query(`
+        SELECT *
+        FROM url
+    `);
+}
+
+export async function checkUrl(id) {
+    return connection.query(`
+        SELECT *
+        FROM url
+        WHERE id = $1
+    `, [id]);
+}
+export async function deleteUrl(id) {
+    return connection.query(`
+        DELETE FROM url
+        WHERE id = $1
+    ` [id]);
+}
