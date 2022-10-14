@@ -58,3 +58,13 @@ export async function deleteUrl(id) {
         WHERE id = $1
     ` [id]);
 }
+
+export async function getRanking() {
+    return connection.query(`
+        SELECT users.id, users.name, COUNT(url) AS "linksCount", sum(visit_count) AS "visitCount"
+        FROM url
+        JOIN users ON users.id = url.user_id
+        GROUP BY users.id
+        LIMIT 10
+    `)
+}

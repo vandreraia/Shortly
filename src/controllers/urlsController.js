@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { checkUrl, checkUser, insertUrl, selectUrlById, selectUrlByUrl, updateCounter } from '../repositories/urlRepository.js';
+import { checkUrl, checkUser, getRanking, insertUrl, selectUrlById, selectUrlByUrl, updateCounter } from '../repositories/urlRepository.js';
 
 export async function shortenUrl(req, res) {
     const { user } = res.locals
@@ -67,5 +67,11 @@ export async function deleteUrls(req, res) {
 }
 
 export async function getRank(req, res) {
-    
+    try {
+        const { rows } = await getRanking();
+
+        return res.status(200).send(rows)
+    } catch (error) {
+        return res.status(500).send(error.message);
+    }
 }
