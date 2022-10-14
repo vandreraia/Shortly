@@ -1,31 +1,34 @@
 import connection from '../db/pgsql.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { searchUser, insertClient } from '../repositories/userReposity.js';
+import { searchUser, insertClient, searchUrl } from '../repositories/userReposity.js';
 
 export async function getUsers(req, res) {
-    const { email } = req.query;
-    try {
-        const params = [];
-        let whereClause = '';
+    const { user } = res.locals;
 
-        if (email) {
-            params.push(`${email}%`);
-            whereClause += `WHERE email ILIKE $${params.length}`;
+    try {
+        console.log(user)
+        const userInfo = (await searchUser(user)).rows[0];
+        if (!userInfo) {
+            return sendStatus(404);
+        }
+        const urls = (await searchUrl(userInfo.id)).rows;
+        console.log(urls)
+        let count = 0;
+        for (let i = 0; i < urls.length; i++) {
+            count += urls[i].visitCount;
         }
 
-        const { rows: users } = await connection.query(
-            `
-    SELECT * FROM users
-    ${whereClause}
-  `,
-            params
-        );
-
-        res.status(200).send(users);
+        const me = {
+            id: userInfo.id,
+            name: userInfo.name,
+            visitCount: count,
+            shortenedUrls: urls
+        }
+        res.status(200).send(me);
     } catch (error) {
         console.log(error);
-        resizeBy.sendStatus(500);
+        res.sendStatus(500);
     }
 }
 
@@ -37,7 +40,7 @@ export async function getUser(req, res) {
         const secretKey = process.env.JWT_SECRET
 
         const { rows: user, rowCount } = await searchUser(email);
-        
+
         if (rowCount === 0) {
             return res.sendStatus(401);
         }
@@ -50,7 +53,7 @@ export async function getUser(req, res) {
             return res.sendStatus(401);
         }
 
-        const obj = {token: token}
+        const obj = { token: token }
         return res.status(200).send(obj);
     } catch (error) {
         console.log(error);
@@ -63,7 +66,7 @@ export async function createUser(req, res) {
 
     try {
         if (password !== confirmPassword) {
-          return res.sendStatus(422);
+            return res.sendStatus(422);
         }
         const { rowCount } = await searchUser(email);
 

@@ -16,3 +16,9 @@ export async function insertClient(name, email, password) {
         [name, email, cryptoPassword]
     );
 }
+
+export async function searchUrl(id) {
+    return connection.query(
+        'SELECT id, short_url AS "shortUrl", url, visit_count AS "visitCount" FROM url WHERE user_id = $1', [id]
+    );
+}
