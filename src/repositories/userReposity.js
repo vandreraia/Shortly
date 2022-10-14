@@ -22,3 +22,8 @@ export async function searchUrl(id) {
         'SELECT id, short_url AS "shortUrl", url, visit_count AS "visitCount" FROM url WHERE user_id = $1', [id]
     );
 }
+export async function countUrl(id) {
+    return connection.query(
+        'SELECT SUM(visit_count) FROM url WHERE user_id = $1', [id]
+    );
+}

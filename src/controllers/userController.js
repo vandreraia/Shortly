@@ -1,7 +1,7 @@
 import connection from '../db/pgsql.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { searchUser, insertClient, searchUrl } from '../repositories/userReposity.js';
+import { searchUser, insertClient, searchUrl, countUrl } from '../repositories/userReposity.js';
 
 export async function getUsers(req, res) {
     const { user } = res.locals;
@@ -14,11 +14,12 @@ export async function getUsers(req, res) {
         }
         const urls = (await searchUrl(userInfo.id)).rows;
         console.log(urls)
-        let count = 0;
-        for (let i = 0; i < urls.length; i++) {
-            count += urls[i].visitCount;
-        }
+        let count = (await countUrl(userInfo.id)).rows[0].sum;
+        // for (let i = 0; i < urls.length; i++) {
+        //     count += urls[i].visitCount;
+        // }
 
+        console.log(count)
         const me = {
             id: userInfo.id,
             name: userInfo.name,
