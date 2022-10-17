@@ -7,19 +7,14 @@ export async function getUsers(req, res) {
     const { user } = res.locals;
 
     try {
-        console.log(user)
         const userInfo = (await searchUser(user)).rows[0];
         if (!userInfo) {
             return sendStatus(404);
         }
         const urls = (await searchUrl(userInfo.id)).rows;
-        console.log(urls)
-        let count = (await countUrl(userInfo.id)).rows[0].sum;
-        // for (let i = 0; i < urls.length; i++) {
-        //     count += urls[i].visitCount;
-        // }
 
-        console.log(count)
+        let count = (await countUrl(userInfo.id)).rows[0].sum;
+
         const me = {
             id: userInfo.id,
             name: userInfo.name,
@@ -35,7 +30,6 @@ export async function getUsers(req, res) {
 
 export async function getUser(req, res) {
     const { email, password } = req.body;
-    const { user } = res.locals;
 
     try {
         const secretKey = process.env.JWT_SECRET
